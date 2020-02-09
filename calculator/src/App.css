@@ -1,38 +1,34 @@
-.App {
-  text-align: center;
+main {
+  display: grid;
+  grid-template-rows: auto 1fr 2fr 1fr;
+  grid-template-areas: 
+    'header header'
+    'loan-setting loan-setting'
+    'rcf-calculator bl-calculator'
+    'footer footer'
+  ;
+  gap: 10px;
+  justify-content: stretch;
+  height: 99vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+header {
+  grid-area: header;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+#loan-setting {
+  grid-area: loan-setting;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-content: end;
 }
 
-.App-link {
-  color: #61dafb;
+#rcf-calculator {
+  grid-area: rcf-calculator;
+}
+#bl-calculator {
+  grid-area: bl-calculator;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+footer {
+  align-self: end;
 }
