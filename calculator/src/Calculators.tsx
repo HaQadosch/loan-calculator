@@ -64,17 +64,25 @@ const useStyles = makeStyles({
   },
 });
 
-function createData (name: string, calories: string, fat: string, carbs: string) {
-  return { name, calories, fat, carbs }
+const formatDate = (startingDate: Date, index: number) => {
+  const newMonth = startingDate.getMonth() + index
+  const newDate = new Date()
+  newDate.setMonth(newMonth)
+
+  const dateISO = newDate.toISOString()
+  const options = { month: "2-digit", day: "2-digit", year: "numeric" }
+  const newDateISO = new Date(dateISO)
+  return new Intl.DateTimeFormat("UK-gb", options).format(newDateISO)
 }
 
-const rows = [
-  createData('30/06/2019', '2,500', '300', '2,800'),
-  createData('30/07/2019', '2,500', '225', '2,725'),
-  createData('30/08/2019', '2,500', '150', '2,650'),
-  createData('30/09/2019', '2,500', '75', '2,575'),
-  createData('Total', '10000', '750', '10,750'),
-];
+const startingDate = new Date()
+const payments = [1, 1, 1, 1].map((_, index) => {
+
+  return { date: formatDate(startingDate, index), principal: '2,500', interest: '300', total: '2800' }
+})
+
+console.log({ payments })
+
 
 interface IDenseTable {
   premium: number
@@ -95,14 +103,14 @@ function DenseTable ({ premium }: IDenseTable): JSX.Element {
           </TableRow>
         </TableHead>
         <TableBody>
-          { rows.map(row => (
-            <TableRow key={ row.name }>
+          { payments.map(({ date, principal, interest, total }) => (
+            <TableRow key={ date }>
               <TableCell component="th" scope="row">
-                { row.name }
+                { date }
               </TableCell>
-              <TableCell align="right">{ row.calories }</TableCell>
-              <TableCell align="right">{ row.fat }</TableCell>
-              <TableCell align="right">{ row.carbs }</TableCell>
+              <TableCell align="right">{ principal }</TableCell>
+              <TableCell align="right">{ interest }</TableCell>
+              <TableCell align="right">{ total }</TableCell>
             </TableRow>
           )) }
         </TableBody>
