@@ -2,12 +2,13 @@ import React from 'react'
 import './LoanSetting.css'
 
 interface ILoanSetting {
-
+  amount: number
+  duration: number
+  setAmount: React.Dispatch<React.SetStateAction<number>>
+  setDuration: React.Dispatch<React.SetStateAction<number>>
 }
 
-export const LoanSetting: React.FC<ILoanSetting> = () => {
-  const [amount, setAmount] = React.useState(1000)
-  const [duration, setDuration] = React.useState(1)
+export const LoanSetting: React.FC<ILoanSetting> = ({amount, duration, setAmount, setDuration}) => {
 
   return (
     <article id="loan-setting">
