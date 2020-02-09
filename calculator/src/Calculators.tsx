@@ -72,13 +72,19 @@ const formatDate = (startingDate: Date, index: number) => {
   const dateISO = newDate.toISOString()
   const options = { month: "2-digit", day: "2-digit", year: "numeric" }
   const newDateISO = new Date(dateISO)
-  return new Intl.DateTimeFormat("UK-gb", options).format(newDateISO)
+  return new Intl.DateTimeFormat("en-GB", options).format(newDateISO)
 }
+
+const formatCurrency = (price: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(price)
 
 const startingDate = new Date()
 const payments = [1, 1, 1, 1].map((_, index) => {
+  const date = formatDate(startingDate, index)
+  const principal = formatCurrency(2500)
+  const interest = formatCurrency(300)
+  const total = formatCurrency(2000)
 
-  return { date: formatDate(startingDate, index), principal: '2,500', interest: '300', total: '2800' }
+  return { date, principal, interest, total }
 })
 
 console.log({ payments })
