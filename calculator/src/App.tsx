@@ -4,7 +4,7 @@ import { LoanSetting } from './LoanSetting';
 import { CalculatorRCF, CalculatorBL } from './Calculators';
 
 const App = () => {
-  const [amount, setAmount] = React.useState(1000)
+  const [amount, setAmount] = React.useState(10000)
   const [duration, setDuration] = React.useState(4)
 
   return (

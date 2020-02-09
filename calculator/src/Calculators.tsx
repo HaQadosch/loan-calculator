@@ -13,9 +13,10 @@ interface ICalculator {
   premium: number
   title: string
   duration: number
+  amount: number
 }
 
-const Calculator: React.FC<ICalculator> = ({ premium, title, duration }) => {
+const Calculator: React.FC<ICalculator> = ({ premium, title, duration, amount }) => {
   const [rate, setRate] = React.useState(3)
 
   return (
@@ -31,7 +32,7 @@ const Calculator: React.FC<ICalculator> = ({ premium, title, duration }) => {
         />
         <span>(in £)</span>
       </form>
-      <DenseTable premium={ premium } duration={ duration } />
+      <DenseTable premium={ premium } duration={ duration } amount={ amount } rate={ rate } />
       <h2>{ title }</h2>
     </>
   )
@@ -52,6 +53,7 @@ export const CalculatorRCF: React.FC<ICalculators> = ({ amount, duration }) => (
       premium={ 0 }
       title='Revolving Credit Facility'
       duration={ duration }
+      amount={ amount }
     />
   </article>
 )
@@ -62,6 +64,7 @@ export const CalculatorBL: React.FC<ICalculators> = ({ amount, duration }) => (
       premium={ 10 }
       title='Business Loan'
       duration={ duration }
+      amount={ amount }
     />
   </article>
 )
@@ -75,11 +78,13 @@ const useStyles = makeStyles({
 interface IDenseTable {
   premium: number
   duration: number
+  amount: number
+  rate: number
 }
 
-function DenseTable ({ premium, duration }: IDenseTable): JSX.Element {
-  const classes = useStyles();
-  const payments = generatePlan(duration)
+function DenseTable ({ premium, amount, duration, rate }: IDenseTable): JSX.Element {
+  const classes = useStyles()
+  const payments = generatePlan({ amount, duration, premium, rate })
 
   return (
     <TableContainer component={ Paper }>
@@ -109,7 +114,14 @@ function DenseTable ({ premium, duration }: IDenseTable): JSX.Element {
   );
 }
 
-function generatePlan (duration: number) {
+interface IGenerate {
+  amount: number
+  duration: number
+  premium: number
+  rate: number
+}
+
+function generatePlan ({ amount, duration, premium, rate }: IGenerate) {
   const formatDate = (startingDate: Date, index: number) => {
     const newMonth = startingDate.getMonth() + index
     const newDate = new Date()
@@ -121,22 +133,39 @@ function generatePlan (duration: number) {
     return new Intl.DateTimeFormat("en-GB", options).format(newDateISO)
   }
 
-  const formatCurrency = (price: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(price)
+  const formatCurrency = (price: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 0 }).format(price)
 
   const startingDate = new Date()
+
+  let principalAcc = amount
+  let interestAcc = 0
+  let totalAcc = 0
+
   const payments = new Array(duration).fill(1).map((_, index) => {
     const date = formatDate(startingDate, index)
-    const principal = formatCurrency(2500)
-    const interest = formatCurrency(300)
-    const total = formatCurrency(2000)
+
+    const principal_ = amount / duration
+    const principal = formatCurrency(principal_)
+
+    const premium_ = index === 0 ? amount * (premium * 0.01) : 0
+    const interest_ = principalAcc * (rate * 0.01) + premium_
+    interestAcc += interest_
+
+    principalAcc -= principal_
+
+    const interest = formatCurrency(interest_)
+
+    const total_ = interest_ + principal_
+    totalAcc += total_
+    const total = formatCurrency(total_)
 
     return { date, principal, interest, total }
   })
   const totalPlan = {
     date: 'Total',
-    principal: formatCurrency(10_000),
-    interest: formatCurrency(750),
-    total: formatCurrency(10_750)
+    principal: formatCurrency(amount),
+    interest: formatCurrency(interestAcc),
+    total: formatCurrency(totalAcc)
   }
   payments.push(totalPlan)
 
