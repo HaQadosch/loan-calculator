@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { LoanSetting } from './LoanSetting';
+import { CalculatorRCF, CalculatorBL } from './Calculators';
 
 const App = () => {
   return (
@@ -11,9 +12,9 @@ const App = () => {
         </h1>
       </header>
       <LoanSetting />
-      <article id="rcf-calculator">RCF repayment calculator</article>
-      <article id="bl-calculator">BL repayment calculator</article>
-      <footer>Footer, get to talk to a real person</footer>
+      <CalculatorRCF />
+      <CalculatorBL />
+      <footer>Footer, get to talk to a real person <span role="img" aria-label="phone">📞</span> 020 3778 0274</footer>
     </>
   );
 }

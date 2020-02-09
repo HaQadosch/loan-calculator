@@ -8,8 +8,8 @@ article {
 form {
   display: grid;
   grid-template-columns: 1fr 100px 1fr;
+  grid-template-rows: max-content max-content;
   gap: 10px;
-  justify-content: center;
   align-items: center;
+  align-self: end;
 }
-
