@@ -12,9 +12,10 @@ import Paper from '@material-ui/core/Paper';
 interface ICalculator {
   premium: number
   title: string
+  duration: number
 }
 
-const Calculator: React.FC<ICalculator> = ({ premium, title }) => {
+const Calculator: React.FC<ICalculator> = ({ premium, title, duration }) => {
   const [rate, setRate] = React.useState(3)
 
   return (
@@ -30,7 +31,7 @@ const Calculator: React.FC<ICalculator> = ({ premium, title }) => {
         />
         <span>(in £)</span>
       </form>
-      <DenseTable premium={ premium } />
+      <DenseTable premium={ premium } duration={ duration } />
       <h2>{ title }</h2>
     </>
   )
@@ -40,20 +41,27 @@ const Calculator: React.FC<ICalculator> = ({ premium, title }) => {
   }
 }
 
-export const CalculatorRCF: React.FC = () => (
+interface ICalculators {
+  amount: number
+  duration: number
+}
+
+export const CalculatorRCF: React.FC<ICalculators> = ({ amount, duration }) => (
   <article id="rcf-calculator">
     <Calculator
       premium={ 0 }
       title='Revolving Credit Facility'
+      duration={ duration }
     />
   </article>
 )
 
-export const CalculatorBL: React.FC = () => (
+export const CalculatorBL: React.FC<ICalculators> = ({ amount, duration }) => (
   <article id="bl-calculator">
     <Calculator
       premium={ 10 }
       title='Business Loan'
+      duration={ duration }
     />
   </article>
 )
@@ -64,38 +72,14 @@ const useStyles = makeStyles({
   },
 });
 
-const formatDate = (startingDate: Date, index: number) => {
-  const newMonth = startingDate.getMonth() + index
-  const newDate = new Date()
-  newDate.setMonth(newMonth)
-
-  const dateISO = newDate.toISOString()
-  const options = { month: "2-digit", day: "2-digit", year: "numeric" }
-  const newDateISO = new Date(dateISO)
-  return new Intl.DateTimeFormat("en-GB", options).format(newDateISO)
-}
-
-const formatCurrency = (price: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(price)
-
-const startingDate = new Date()
-const payments = [1, 1, 1, 1].map((_, index) => {
-  const date = formatDate(startingDate, index)
-  const principal = formatCurrency(2500)
-  const interest = formatCurrency(300)
-  const total = formatCurrency(2000)
-
-  return { date, principal, interest, total }
-})
-
-console.log({ payments })
-
-
 interface IDenseTable {
   premium: number
+  duration: number
 }
 
-function DenseTable ({ premium }: IDenseTable): JSX.Element {
+function DenseTable ({ premium, duration }: IDenseTable): JSX.Element {
   const classes = useStyles();
+  const payments = generatePlan(duration)
 
   return (
     <TableContainer component={ Paper }>
@@ -123,4 +107,39 @@ function DenseTable ({ premium }: IDenseTable): JSX.Element {
       </Table>
     </TableContainer>
   );
+}
+
+function generatePlan (duration: number) {
+  const formatDate = (startingDate: Date, index: number) => {
+    const newMonth = startingDate.getMonth() + index
+    const newDate = new Date()
+    newDate.setMonth(newMonth)
+
+    const dateISO = newDate.toISOString()
+    const options = { month: "2-digit", day: "2-digit", year: "numeric" }
+    const newDateISO = new Date(dateISO)
+    return new Intl.DateTimeFormat("en-GB", options).format(newDateISO)
+  }
+
+  const formatCurrency = (price: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(price)
+
+  const startingDate = new Date()
+  const payments = new Array(duration).fill(1).map((_, index) => {
+    const date = formatDate(startingDate, index)
+    const principal = formatCurrency(2500)
+    const interest = formatCurrency(300)
+    const total = formatCurrency(2000)
+
+    return { date, principal, interest, total }
+  })
+  const totalPlan = {
+    date: 'Total',
+    principal: formatCurrency(10_000),
+    interest: formatCurrency(750),
+    total: formatCurrency(10_750)
+  }
+  payments.push(totalPlan)
+
+  console.log({ payments })
+  return payments
 }
