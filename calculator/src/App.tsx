@@ -55,7 +55,7 @@ const App = () => {
         <CalculatorRCF amount={ amount } duration={ duration } />
         <CalculatorBL amount={ amount } duration={ duration } />
       </LoanSettingContext.Provider>
-      <footer>Footer, get to talk to a real person <span role="img" aria-label="phone">📞</span> 020 3778 0274</footer>
+      <footer>Talk to a real person <span role="img" aria-label="phone">📞</span> 020 3778 0274</footer>
     </>
   )
 }
