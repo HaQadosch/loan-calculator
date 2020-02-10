@@ -1,4 +1,5 @@
 import React from 'react'
+import { LoanSettingContext } from "./App";
 
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -17,10 +18,28 @@ interface ICalculator {
 }
 
 const Calculator: React.FC<ICalculator> = ({ premium, title, duration, amount }) => {
+  const loanSetting = React.useContext(LoanSettingContext)
   const [rate, setRate] = React.useState(3)
 
+  const calcSetting = premium === 0
+    ? loanSetting.revolving_credit_facility
+    : loanSetting.business_loan
+
+  const isWithinAmountLimit = calcSetting.amount_min <= amount && amount <= calcSetting.amount_max
+  const isWithinDurationLimit = calcSetting.duration_min <= duration && duration <= calcSetting.duration_max
+  const isDisabled = !(isWithinDurationLimit && isWithinAmountLimit)
+
+
+  let duration_ = duration
+  duration_ = Math.min(duration_, calcSetting.duration_max)
+  duration_ = Math.max(duration_, calcSetting.duration_min)
+
+  let amount_ = amount
+  amount_ = Math.min(amount_, calcSetting.amount_max)
+  amount_ = Math.max(amount_, calcSetting.amount_min)
+
   return (
-    <>
+    <section className={ isDisabled ? 'disabled' : 'enabled' }>
       <form >
         <label htmlFor="rate">Interest rate</label>
         <input type="number"
@@ -29,12 +48,13 @@ const Calculator: React.FC<ICalculator> = ({ premium, title, duration, amount })
           value={ rate } step="1"
           onChange={ handleRateChange }
           required
+          { ...isDisabled ? ({ readOnly: true, disabled: true }) : {} }
         />
         <span>(in £)</span>
       </form>
-      <DenseTable premium={ premium } duration={ duration } amount={ amount } rate={ rate } />
+      <DenseTable premium={ premium } duration={ duration_ } amount={ amount_ } rate={ rate } />
       <h2>{ title }</h2>
-    </>
+    </section>
   )
 
   function handleRateChange ({ target: { value: rate } }: React.ChangeEvent<HTMLInputElement>) {
@@ -47,33 +67,34 @@ interface ICalculators {
   duration: number
 }
 
-export const CalculatorRCF: React.FC<ICalculators> = ({ amount, duration }) => (
-  <article id="rcf-calculator">
-    <Calculator
-      premium={ 0 }
-      title='Revolving Credit Facility'
-      duration={ duration }
-      amount={ amount }
-    />
-  </article>
-)
+export const CalculatorRCF: React.FC<ICalculators> = ({ amount, duration }) => {
 
-export const CalculatorBL: React.FC<ICalculators> = ({ amount, duration }) => (
-  <article id="bl-calculator">
-    <Calculator
-      premium={ 10 }
-      title='Business Loan'
-      duration={ duration }
-      amount={ amount }
-    />
-  </article>
-)
+  return (
+    <article id="rcf-calculator">
+      <Calculator
+        premium={ 0 }
+        title='Revolving Credit Facility'
+        duration={ duration }
+        amount={ amount }
+      />
+    </article>
+  )
+}
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 350,
-  },
-});
+export const CalculatorBL: React.FC<ICalculators> = ({ amount, duration }) => {
+
+  return (
+    <article id="bl-calculator">
+      <Calculator
+        premium={ 10 }
+        title='Business Loan'
+        duration={ duration }
+        amount={ amount }
+      />
+    </article>
+  )
+}
+
 
 interface IDenseTable {
   premium: number
@@ -82,12 +103,19 @@ interface IDenseTable {
   rate: number
 }
 
+
+const useStyles = makeStyles({
+  table: {
+    minWidth: 350,
+  },
+})
+
 function DenseTable ({ premium, amount, duration, rate }: IDenseTable): JSX.Element {
   const classes = useStyles()
   const payments = generatePlan({ amount, duration, premium, rate })
 
   return (
-    <TableContainer component={ Paper }>
+    <TableContainer component={ Paper } >
       <Table className={ classes.table } size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
@@ -100,9 +128,7 @@ function DenseTable ({ premium, amount, duration, rate }: IDenseTable): JSX.Elem
         <TableBody>
           { payments.map(({ date, principal, interest, total }) => (
             <TableRow key={ date }>
-              <TableCell component="th" scope="row">
-                { date }
-              </TableCell>
+              <TableCell component="th" scope="row">{ date }</TableCell>
               <TableCell align="right">{ principal }</TableCell>
               <TableCell align="right">{ interest }</TableCell>
               <TableCell align="right">{ total }</TableCell>

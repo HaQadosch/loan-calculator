@@ -32,3 +32,12 @@ header {
 footer {
   align-self: end;
 }
+
+input[type=number] {
+  text-align: end;
+}
+
+section.disabled {
+  background-color: rgb(227, 227, 227);
+  color: rgb(109, 109, 109);
+}
