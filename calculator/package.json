@@ -2,7 +2,7 @@
   "name": "calculator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://HaQadosch.github.io/loan-calculator",
+  "homepage": "https://haqadosch.github.io/loan-calculator/",
   "dependencies": {
     "@material-ui/core": "^4.9.1",
     "@reduxjs/toolkit": "^1.2.3",
